@@ -44,6 +44,8 @@ class d3linechart extends d3chart {
             margin: { top: 20, right: 20, bottom: 20, left: 40 },
             values: [],
             date: { key: false, inputFormat: "%Y-%m-%d", outputFormat: "%Y-%m-%d" },
+            sort: (a, b) => a - b,
+            key: null,
             color: { key: false, keys: false, scheme: false, current: '#1f77b4', default: '#AAA', axis: '#000' },
             curve: 'curveLinear',
             points: { visibleSize: 3, hoverSize: 6 },
@@ -63,8 +65,8 @@ class d3linechart extends d3chart {
         this.initChartFrame('linechart');
 
         // Format date functions
-        this.parseTime = d3.timeParse(this.cfg.date.inputFormat);
-        this.formatTime = d3.timeFormat(this.cfg.date.outputFormat);
+        this.parseTime = this.cfg.date ? d3.timeParse(this.cfg.date.inputFormat):null;
+        this.formatTime = this.cfg.date ? d3.timeFormat(this.cfg.date.outputFormat):(v) => v;
 
         // Init scales
         this.yScale = d3.scaleLinear();
@@ -110,8 +112,13 @@ class d3linechart extends d3chart {
             tData[i].values = [];
         });
 
-        this.data.forEach(d => { d.jsdate = this.parseTime(d[this.cfg.date.key]) });
-        this.data.sort((a, b) => a.jsdate - b.jsdate);
+        if ( this.parseTime ) {
+            this.data.forEach(d => { d.jsdate = this.parseTime(d[this.cfg.date.key]) });
+        } else {
+            this.data.forEach(d => { d.jsdate = d[this.cfg.key] });
+        }
+
+        this.data.sort((a, b) => this.cfg.sort(a.jsdate, b.jsdate));
 
         this.data.forEach((d, c) => {
             d.min = 9999999999999999999;

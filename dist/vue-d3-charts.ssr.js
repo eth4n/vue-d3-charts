@@ -116,6 +116,19 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -132,20 +145,35 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
 function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
 }
 
 function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
 }
 
 function _arrayWithHoles(arr) {
@@ -153,14 +181,11 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
-  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-    return;
-  }
-
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -186,12 +211,29 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
 function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }//
 //
 //
@@ -403,7 +445,7 @@ var __vue_module_identifier__ = "data-v-52bb9522";
 var __vue_is_functional_template__ = false;
 /* style inject shadow dom */
 
-var __vue_component__ = normalizeComponent({
+var __vue_component__ = /*#__PURE__*/normalizeComponent({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, createInjectorSSR, undefined);var d3 = {
@@ -413,9 +455,7 @@ var __vue_component__ = normalizeComponent({
 * D3 Chart Base
 */
 
-var d3chart =
-/*#__PURE__*/
-function () {
+var d3chart = /*#__PURE__*/function () {
   function d3chart(selection, data, config, cfg) {
     var _this = this;
 
@@ -746,15 +786,15 @@ function () {
  * D3 Bar Chart
  */
 
-var d3barchart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3barchart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3barchart, _d3chart);
+
+  var _super = _createSuper(d3barchart);
 
   function d3barchart(selection, data, config) {
     _classCallCheck(this, d3barchart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3barchart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 10,
         right: 30,
@@ -789,7 +829,7 @@ function (_d3chart) {
         duration: 350,
         ease: "easeLinear"
       }
-    }));
+    });
   }
   /**
    * Init chart
@@ -986,7 +1026,7 @@ var __vue_is_functional_template__$1 = undefined;
 
 /* style inject shadow dom */
 
-var __vue_component__$1 = normalizeComponent({}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, false, undefined, undefined, undefined);var d3$2 = {
+var __vue_component__$1 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, false, undefined, undefined, undefined);var d3$2 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleOrdinal: d3Scale.scaleOrdinal,
@@ -1063,15 +1103,15 @@ var __vue_component__$1 = normalizeComponent({}, __vue_inject_styles__$1, __vue_
  * D3 Line Chart
  */
 
-var d3linechart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3linechart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3linechart, _d3chart);
+
+  var _super = _createSuper(d3linechart);
 
   function d3linechart(selection, data, config) {
     _classCallCheck(this, d3linechart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3linechart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 20,
         right: 20,
@@ -1084,6 +1124,10 @@ function (_d3chart) {
         inputFormat: "%Y-%m-%d",
         outputFormat: "%Y-%m-%d"
       },
+      sort: function sort(a, b) {
+        return a - b;
+      },
+      key: null,
       color: {
         key: false,
         keys: false,
@@ -1112,7 +1156,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -1126,8 +1170,10 @@ function (_d3chart) {
       this.getDimensions();
       this.initChartFrame('linechart'); // Format date functions
 
-      this.parseTime = d3$2.timeParse(this.cfg.date.inputFormat);
-      this.formatTime = d3$2.timeFormat(this.cfg.date.outputFormat); // Init scales
+      this.parseTime = this.cfg.date ? d3$2.timeParse(this.cfg.date.inputFormat) : null;
+      this.formatTime = this.cfg.date ? d3$2.timeFormat(this.cfg.date.outputFormat) : function (v) {
+        return v;
+      }; // Init scales
 
       this.yScale = d3$2.scaleLinear();
       this.xScale = d3$2.scaleTime();
@@ -1161,11 +1207,19 @@ function (_d3chart) {
         tData[i].key = j;
         tData[i].values = [];
       });
-      this.data.forEach(function (d) {
-        d.jsdate = _this.parseTime(d[_this.cfg.date.key]);
-      });
+
+      if (this.parseTime) {
+        this.data.forEach(function (d) {
+          d.jsdate = _this.parseTime(d[_this.cfg.date.key]);
+        });
+      } else {
+        this.data.forEach(function (d) {
+          d.jsdate = d[_this.cfg.key];
+        });
+      }
+
       this.data.sort(function (a, b) {
-        return a.jsdate - b.jsdate;
+        return _this.cfg.sort(a.jsdate, b.jsdate);
       });
       this.data.forEach(function (d, c) {
         d.min = 9999999999999999999;
@@ -1373,7 +1427,7 @@ var __vue_is_functional_template__$2 = undefined;
 
 /* style inject shadow dom */
 
-var __vue_component__$2 = normalizeComponent({}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, undefined, undefined);var d3$3 = {
+var __vue_component__$2 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, false, undefined, undefined, undefined);var d3$3 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -1436,15 +1490,15 @@ var __vue_component__$2 = normalizeComponent({}, __vue_inject_styles__$2, __vue_
 * D3 Pie Chart
 */
 
-var d3piechart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3piechart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3piechart, _d3chart);
+
+  var _super = _createSuper(d3piechart);
 
   function d3piechart(selection, data, config) {
     _classCallCheck(this, d3piechart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3piechart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 40,
         right: 20,
@@ -1471,7 +1525,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -1719,7 +1773,7 @@ var __vue_module_identifier__$3 = "data-v-ac66c84e";
 var __vue_is_functional_template__$3 = undefined;
 /* style inject shadow dom */
 
-var __vue_component__$3 = normalizeComponent({}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, false, undefined, createInjectorSSR, undefined);var d3$4 = {
+var __vue_component__$3 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, false, undefined, createInjectorSSR, undefined);var d3$4 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -1779,15 +1833,15 @@ var __vue_component__$3 = normalizeComponent({}, __vue_inject_styles__$3, __vue_
 * D3 Slope Chart
 */
 
-var d3slopechart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3slopechart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3slopechart, _d3chart);
+
+  var _super = _createSuper(d3slopechart);
 
   function d3slopechart(selection, data, config) {
     _classCallCheck(this, d3slopechart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3slopechart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 10,
         right: 100,
@@ -1816,7 +1870,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2043,7 +2097,7 @@ var __vue_module_identifier__$4 = "data-v-6b03ba8c";
 var __vue_is_functional_template__$4 = undefined;
 /* style inject shadow dom */
 
-var __vue_component__$4 = normalizeComponent({}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, undefined, createInjectorSSR, undefined);var d3$5 = {
+var __vue_component__$4 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, false, undefined, createInjectorSSR, undefined);var d3$5 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -2106,15 +2160,15 @@ var __vue_component__$4 = normalizeComponent({}, __vue_inject_styles__$4, __vue_
 * D3 Sunburst
 */
 
-var d3sunburst =
-/*#__PURE__*/
-function (_d3chart) {
+var d3sunburst = /*#__PURE__*/function (_d3chart) {
   _inherits(d3sunburst, _d3chart);
+
+  var _super = _createSuper(d3sunburst);
 
   function d3sunburst(selection, data, config) {
     _classCallCheck(this, d3sunburst);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3sunburst).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 20,
         right: 20,
@@ -2135,7 +2189,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2368,7 +2422,7 @@ var __vue_is_functional_template__$5 = undefined;
 
 /* style inject shadow dom */
 
-var __vue_component__$5 = normalizeComponent({}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, undefined, undefined, undefined);var d3$6 = {
+var __vue_component__$5 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, false, undefined, undefined, undefined);var d3$6 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleOrdinal: d3Scale.scaleOrdinal,
@@ -2429,15 +2483,15 @@ var __vue_component__$5 = normalizeComponent({}, __vue_inject_styles__$5, __vue_
  * D3 Words Cloud
  */
 
-var d3wordscloud =
-/*#__PURE__*/
-function (_d3chart) {
+var d3wordscloud = /*#__PURE__*/function (_d3chart) {
   _inherits(d3wordscloud, _d3chart);
+
+  var _super = _createSuper(d3wordscloud);
 
   function d3wordscloud(selection, data, config) {
     _classCallCheck(this, d3wordscloud);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3wordscloud).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 20,
         right: 20,
@@ -2464,7 +2518,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2656,7 +2710,7 @@ var __vue_is_functional_template__$6 = undefined;
 
 /* style inject shadow dom */
 
-var __vue_component__$6 = normalizeComponent({}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, undefined, undefined, undefined);var d3$7 = {
+var __vue_component__$6 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, false, undefined, undefined, undefined);var d3$7 = {
   select: d3Selection.select,
   selectAll: d3Selection.selectAll,
   scaleLinear: d3Scale.scaleLinear,
@@ -2719,15 +2773,15 @@ var __vue_component__$6 = normalizeComponent({}, __vue_inject_styles__$6, __vue_
 * D3 Slices Chart
 */
 
-var d3sliceschart =
-/*#__PURE__*/
-function (_d3chart) {
+var d3sliceschart = /*#__PURE__*/function (_d3chart) {
   _inherits(d3sliceschart, _d3chart);
+
+  var _super = _createSuper(d3sliceschart);
 
   function d3sliceschart(selection, data, config) {
     _classCallCheck(this, d3sliceschart);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(d3sliceschart).call(this, selection, data, config, {
+    return _super.call(this, selection, data, config, {
       margin: {
         top: 40,
         right: 20,
@@ -2754,7 +2808,7 @@ function (_d3chart) {
         duration: 350,
         ease: 'easeLinear'
       }
-    }));
+    });
   }
   /**
   * Init chart
@@ -2898,25 +2952,25 @@ function (_d3chart) {
 
   }, {
     key: "updateElements",
-    value: function updateElements() {}
-    /*
-            // PATHS
-            this.itemg.selectAll(".chart__slice")
-                .style('opacity', 0)
-                .data(this.pie(this.data), d => d.data[this.cfg.key])
-                .transition(this.transition)
-                .delay((d,i) => i * this.cfg.transition.duration)
-                .attrTween('d', d => {
-                    const i = d3.interpolate(d.startAngle+0.1, d.endAngle);
-                    return t => {
-                        d.endAngle = i(t); 
-                        return this.arc(d)
-                    }
-                })
-                .style("fill", this.cfg.color.default)
-                .style('opacity', 1);
-    */
-
+    value: function updateElements() {
+      /*
+              // PATHS
+              this.itemg.selectAll(".chart__slice")
+                  .style('opacity', 0)
+                  .data(this.pie(this.data), d => d.data[this.cfg.key])
+                  .transition(this.transition)
+                  .delay((d,i) => i * this.cfg.transition.duration)
+                  .attrTween('d', d => {
+                      const i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+                      return t => {
+                          d.endAngle = i(t); 
+                          return this.arc(d)
+                      }
+                  })
+                  .style("fill", this.cfg.color.default)
+                  .style('opacity', 1);
+      */
+    }
     /**
     * Remove chart's elements without data
     */
@@ -2983,7 +3037,7 @@ var __vue_module_identifier__$7 = "data-v-6a52c448";
 var __vue_is_functional_template__$7 = undefined;
 /* style inject shadow dom */
 
-var __vue_component__$7 = normalizeComponent({}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, false, undefined, createInjectorSSR, undefined);/* eslint-disable import/prefer-default-export */var components=/*#__PURE__*/Object.freeze({__proto__:null,D3BarChart: __vue_component__$1,D3LineChart: __vue_component__$2,D3PieChart: __vue_component__$3,D3SlopeChart: __vue_component__$4,D3Sunburst: __vue_component__$5,D3WordsCloud: __vue_component__$6,D3SlicesChart: __vue_component__$7});var install = function installVueD3Charts(Vue) {
+var __vue_component__$7 = /*#__PURE__*/normalizeComponent({}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, false, undefined, createInjectorSSR, undefined);/* eslint-disable import/prefer-default-export */var components=/*#__PURE__*/Object.freeze({__proto__:null,D3BarChart: __vue_component__$1,D3LineChart: __vue_component__$2,D3PieChart: __vue_component__$3,D3SlopeChart: __vue_component__$4,D3Sunburst: __vue_component__$5,D3WordsCloud: __vue_component__$6,D3SlicesChart: __vue_component__$7});var install = function installVueD3Charts(Vue) {
   if (install.installed) return;
   install.installed = true;
   Object.entries(components).forEach(function (_ref) {
